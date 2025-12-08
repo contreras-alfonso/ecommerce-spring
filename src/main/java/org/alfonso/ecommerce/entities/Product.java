@@ -13,7 +13,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "products")
 public class Product {
@@ -24,6 +30,9 @@ public class Product {
     private String id;
 
     private String name;
+
+    @Column(unique = true)
+    private String slug;
 
     private String description;
 
@@ -37,6 +46,10 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @ManyToOne
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
     private List<ProductVariant> variants;
@@ -44,84 +57,6 @@ public class Product {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
     private List<ProductColorImage> colorImages = new ArrayList<>();
-
-    public Product() {
-    }
-
-    public Product(String name, String description, Double basePrice, boolean usesTechnicalVariants, Category category,
-            List<ProductVariant> variants, List<ProductColorImage> colorImages) {
-        this.name = name;
-        this.description = description;
-        this.basePrice = basePrice;
-        this.usesTechnicalVariants = usesTechnicalVariants;
-        this.category = category;
-        this.variants = variants;
-        this.colorImages = colorImages;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Double getBasePrice() {
-        return basePrice;
-    }
-
-    public void setBasePrice(Double basePrice) {
-        this.basePrice = basePrice;
-    }
-
-    public boolean isUsesTechnicalVariants() {
-        return usesTechnicalVariants;
-    }
-
-    public void setUsesTechnicalVariants(boolean usesTechnicalVariants) {
-        this.usesTechnicalVariants = usesTechnicalVariants;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public List<ProductVariant> getVariants() {
-        return variants;
-    }
-
-    public void setVariants(List<ProductVariant> variants) {
-        this.variants = variants;
-    }
-
-    public List<ProductColorImage> getColorImages() {
-        return colorImages;
-    }
-
-    public void setColorImages(List<ProductColorImage> colorImages) {
-        this.colorImages = colorImages;
-    }
 
     @Override
     public String toString() {
