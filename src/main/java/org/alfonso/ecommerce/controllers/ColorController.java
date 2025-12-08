@@ -1,5 +1,6 @@
 package org.alfonso.ecommerce.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.alfonso.ecommerce.entities.Color;
 import org.alfonso.ecommerce.services.ColorService;
@@ -28,12 +29,12 @@ public class ColorController {
     }
 
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody Color color) {
+    public ResponseEntity<?> save(@Valid @RequestBody Color color) {
         return ResponseEntity.status(HttpStatus.CREATED).body(colorService.save(color));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@RequestBody Color color, @PathVariable String id) {
+    public ResponseEntity<?> update(@Valid @RequestBody Color color, @PathVariable String id) {
         Optional<Color> optionalColor = colorService.update(id, color);
         if (optionalColor.isPresent()) {
             return ResponseEntity.ok(optionalColor.get());

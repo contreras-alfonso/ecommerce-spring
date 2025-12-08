@@ -35,6 +35,7 @@ public class ColorServiceImpl implements ColorService {
     }
 
     @Override
+    @Transactional
     public Optional<Color> update(String id, Color color) {
         return colorRepository.findById(id)
                 .map(colorDb -> {

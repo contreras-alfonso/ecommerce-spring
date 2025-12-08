@@ -1,12 +1,10 @@
 package org.alfonso.ecommerce.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "brands")
@@ -16,5 +14,20 @@ public class Brand {
     @Column(columnDefinition = "VARCHAR(36)")
     private String id;
 
+    @NotBlank(message = "El nombre es requerido")
+    @Column(unique = true)
     private String name;
+
+    @Column(unique = true)
+    private String slug;
+
+    @Embedded
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    private Audit audit = new Audit();
+
+    public Brand(String name, String slug) {
+        this.name = name;
+        this.slug = slug;
+    }
 }
