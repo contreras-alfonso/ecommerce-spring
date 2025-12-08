@@ -27,8 +27,13 @@ public class S3ServiceImpl implements S3Service {
     @Override
     public String uploadFile(MultipartFile file, String folderPath) {
         String fileName = file.getOriginalFilename();
+
+        // Obtener extensión del archivo
+        int index = fileName.lastIndexOf(".");
+        String extension = fileName.substring(index);
+
         UUID uuid = UUID.randomUUID();
-        String key = folderPath + "/" + uuid + "_" + fileName;
+        String key = folderPath + "/" + uuid  + extension;
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)

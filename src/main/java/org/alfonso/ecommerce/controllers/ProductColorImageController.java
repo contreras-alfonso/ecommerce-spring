@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ProductColorImageController {
 
-    private ProductColorImageService productColorImageService;
+    private final ProductColorImageService productColorImageService;
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestPart("file") MultipartFile file) {
