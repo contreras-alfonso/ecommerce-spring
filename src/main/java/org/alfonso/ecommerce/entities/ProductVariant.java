@@ -24,10 +24,15 @@ public class ProductVariant {
     private String id;
 
     private String ram;
+    
     private String storage;
 
     private Double price;
 
     private Integer stock;
+
+    @ManyToOne
+    @JoinColumn(name = "color_id")
+    private Color color;
 
 }

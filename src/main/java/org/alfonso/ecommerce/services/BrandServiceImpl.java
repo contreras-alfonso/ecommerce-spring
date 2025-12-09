@@ -32,28 +32,34 @@ public class BrandServiceImpl implements BrandService {
     @Override
     @Transactional
     public Brand save(Brand brand) {
-        if (brandRepository.existsByNameIgnoreCase(brand.getName())) {
+        if (brandRepository.existsByNameIgnoreCase(brand.getName().trim())) {
             throw new ResourceConflictException("El nombre de la marca ya existe.");
         }
 
-        String baseSlug = GeneralUtil.generateSlug(brand.getName());
-        String finalSlug = baseSlug;
-        int count = 1;
+        String slug = GeneralUtil.createUniqueSlug(brand.getName(), brandRepository);
+        brand.setSlug(slug);
 
-        // Si el slug existe, agregar un numero adicional
-        while (brandRepository.existsBySlugIgnoreCase(finalSlug)) {
-            finalSlug = baseSlug + "-" + count;
-            count++;
-        }
-
-        brand.setSlug(finalSlug);
         return brandRepository.save(brand);
     }
 
     @Override
     @Transactional
     public Optional<Brand> update(String id, Brand brand) {
+
+
         return brandRepository.findById(id).map(brandDb -> {
+            if (!brand.getName().equals(brandDb.getName())) {
+
+                // Si el nombre cambió, buscar brand por el nombre y comparar los ids
+                brandRepository.findByName(brand.getName()).ifPresent(existBrand -> {
+                    if (!existBrand.getId().equals(id)) {
+                        throw new ResourceConflictException("El nombre de la marca ya existe.");
+                    }
+                });
+
+                String slug = GeneralUtil.createUniqueSlug(brand.getName(), brandRepository);
+                brandDb.setSlug(slug);
+            }
             brandDb.setName(brand.getName());
             return brandRepository.save(brandDb);
         });

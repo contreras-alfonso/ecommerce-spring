@@ -36,9 +36,6 @@ public class Product {
 
     private String description;
 
-    @Column(name = "base_price")
-    private Double basePrice;
-
     @Column(name = "uses_technical_variants")
     private boolean usesTechnicalVariants;
 
@@ -60,8 +57,8 @@ public class Product {
 
     @Override
     public String toString() {
-        return "{id=" + id + ", name=" + name + ", description=" + description + ", basePrice=" + basePrice
-                + ", usesTechnicalVariants=" + usesTechnicalVariants + ", category=" + category + ", variants="
+        return "{id=" + id + ", name=" + name + ", description=" + description +
+                ", usesTechnicalVariants=" + usesTechnicalVariants + ", category=" + category + ", variants="
                 + variants + ", colorImages=" + colorImages + "}";
     }
 
