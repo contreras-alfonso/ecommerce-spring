@@ -15,11 +15,6 @@ public class ProductCreationDTO {
 
     private String description;
 
-    @NotNull(message = "El precio base es requerido")
-    private Double basePrice;
-
-    private String slug;
-
     private boolean usesTechnicalVariants;
 
     @NotBlank(message = "La marca es requerida")
@@ -29,11 +24,9 @@ public class ProductCreationDTO {
     private String categoryId;
 
     @NotNull(message = "Se debe incluir el mapeo de imágenes.")
-    private List<ColorImageMappingDTO> colorImageMappings;
+    private List<ColorImageMappingDTO> colors;
 
     @NotNull(message = "Las variantes de producto son requeridas.")
     private List<VariantDataDTO> variants;
-
-
 
 }

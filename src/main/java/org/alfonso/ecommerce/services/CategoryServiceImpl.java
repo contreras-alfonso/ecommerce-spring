@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.alfonso.ecommerce.entities.Category;
 import org.alfonso.ecommerce.exceptions.ResourceConflictException;
 import org.alfonso.ecommerce.repositories.CategoryRepository;
-import org.alfonso.ecommerce.repositories.SlugExistenceRepository;
 import org.alfonso.ecommerce.utils.GeneralUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Optional<Category> update(String id, Category category) {
 
         return categoryRepository.findById(id).map(categoryDb -> {
-            if (!category.getName().equals(categoryDb.getName())) {
+            if (!category.getName().equalsIgnoreCase(categoryDb.getName())) {
 
                 // Si el nombre cambió, buscar category por el nombre y comparar los ids
                 categoryRepository.findByName(category.getName()).ifPresent(existCategory -> {

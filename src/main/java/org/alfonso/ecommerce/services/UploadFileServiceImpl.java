@@ -12,7 +12,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class ProductColorImageServiceImpl implements ProductColorImageService {
+public class UploadFileServiceImpl implements UploadFileService {
 
     private final S3Service s3Service;
 
@@ -26,7 +26,7 @@ public class ProductColorImageServiceImpl implements ProductColorImageService {
     );
 
     @Override
-    public String upload(MultipartFile file, String folderPath) {
+    public String uploadImage(MultipartFile file, String folderPath) {
         if (file.getSize() > MAX_FILE_SIZE) {
             double maxSizeMb = (double) MAX_FILE_SIZE / (1024 * 1024);
             throw new FileTooLargeException("El tamaño del archivo excede el límite permitido de " + maxSizeMb);
