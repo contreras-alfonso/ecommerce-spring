@@ -3,9 +3,13 @@ package org.alfonso.ecommerce.utils;
 import com.github.slugify.Slugify;
 import org.alfonso.ecommerce.repositories.SlugExistenceRepository;
 
+import java.util.UUID;
+
 public class GeneralUtil {
+
+    private static final Slugify slugify = new Slugify();
+
     public static String generateSlug(String content) {
-        Slugify slugify = new Slugify();
         return slugify.slugify(content);
     }
 
@@ -20,5 +24,14 @@ public class GeneralUtil {
             count++;
         }
         return finalSlug;
+    }
+
+    public static boolean isUuid(String value) {
+        try {
+            UUID.fromString(value);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }

@@ -29,9 +29,10 @@ public class Product {
     @Column(columnDefinition = "VARCHAR(36)")
     private String id;
 
+    @Column(unique = true, nullable = false)
     private String name;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String slug;
 
     private String description;
@@ -40,11 +41,11 @@ public class Product {
     private boolean usesTechnicalVariants;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "brand_id")
+    @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 
     @OneToMany(cascade = CascadeType.ALL)
