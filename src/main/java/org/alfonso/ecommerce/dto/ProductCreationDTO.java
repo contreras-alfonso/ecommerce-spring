@@ -28,9 +28,6 @@ public class ProductCreationDTO {
     @NotBlank(message = "La categoría es requerida")
     private String categoryId;
 
-    @NotNull(message = "Se debe incluir el mapeo de imágenes.")
-    private List<ColorImageMappingDTO> colors;
-
     @NotNull(message = "Las variantes de producto son requeridas.")
     private List<VariantDataDTO> variants;
 

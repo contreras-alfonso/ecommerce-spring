@@ -142,7 +142,7 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setUsesTechnicalVariants(productDto.isUsesTechnicalVariants());
 
         // Validar si la marca cambió
-        if (existingProduct.getBrand().getId().equals(productDto.getBrandId())) {
+        if (!existingProduct.getBrand().getId().equals(productDto.getBrandId())) {
             brandService.findById(productDto.getBrandId()).
                     ifPresentOrElse(existingProduct::setBrand, () -> {
                         throw new EntityNotFoundException("No se encontró la marca seleccionada.");
@@ -150,7 +150,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // Validar si la categoría cambió
-        if (existingProduct.getCategory().getId().equals(productDto.getCategoryId())) {
+        if (!existingProduct.getCategory().getId().equals(productDto.getCategoryId())) {
             categoryService.findById(productDto.getCategoryId()).
                     ifPresentOrElse(existingProduct::setCategory, () -> {
                         throw new EntityNotFoundException("No se encontró la categoría seleccionada.");
@@ -222,7 +222,6 @@ public class ProductServiceImpl implements ProductService {
         // Tratar las imágenes nuevas si es que vienen
         if (files != null && !files.isEmpty()) {
 
-
             //Ordenar imágenes por colorId
             Map<String, List<MultipartFile>> groupFilesByKey = productServiceUtil.groupFilesByKey(files);
 
@@ -237,7 +236,7 @@ public class ProductServiceImpl implements ProductService {
             existingProduct.setColorImages(updatedProductColorImages);
         }
 
-        if (!deleteImagesIds.isEmpty()) {
+        if (deleteImagesIds != null && !deleteImagesIds.isEmpty()) {
             for (String deleteId : deleteImagesIds) {
                 ProductColorImage productColorImage = productColorImageService.findById(deleteId)
                         .orElseThrow(() -> new EntityNotFoundException("No se encontró la imagen"));

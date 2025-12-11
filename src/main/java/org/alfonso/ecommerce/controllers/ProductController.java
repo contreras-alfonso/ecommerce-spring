@@ -49,9 +49,9 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable String id,
-            @PathVariable("product") String productJson,
-            @PathVariable(required = false) Map<String, MultipartFile> newFiles,
-            @PathVariable(required = false) List<String> deleteImagesIds
+            @RequestParam("product") String productJson,
+            @RequestParam(required = false) Map<String, MultipartFile> newFiles,
+            @RequestParam(required = false) List<String> deleteImagesIds
 
     ) {
 
