@@ -3,26 +3,14 @@ package org.alfonso.ecommerce.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "products")
-public class Product {
+public class Product extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -56,11 +44,19 @@ public class Product {
     @JoinColumn(name = "product_id")
     private List<ProductColorImage> colorImages = new ArrayList<>();
 
-    @Override
-    public String toString() {
-        return "{id=" + id + ", name=" + name + ", description=" + description +
-                ", usesTechnicalVariants=" + usesTechnicalVariants + ", category=" + category + ", variants="
-                + variants + ", colorImages=" + colorImages + "}";
-    }
+    /*@Embedded
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    private Audit audit = new Audit();
 
+    public Product(String name, String slug, String description, boolean usesTechnicalVariants, Category category, Brand brand, List<ProductVariant> variants, List<ProductColorImage> colorImages) {
+        this.name = name;
+        this.slug = slug;
+        this.description = description;
+        this.usesTechnicalVariants = usesTechnicalVariants;
+        this.category = category;
+        this.brand = brand;
+        this.variants = variants;
+        this.colorImages = colorImages;
+    }*/
 }

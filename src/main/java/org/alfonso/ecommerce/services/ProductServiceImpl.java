@@ -12,6 +12,8 @@ import org.alfonso.ecommerce.repositories.CategoryRepository;
 import org.alfonso.ecommerce.repositories.ProductRepository;
 import org.alfonso.ecommerce.services.utils.ProductServiceUtil;
 import org.alfonso.ecommerce.utils.GeneralUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,8 +34,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Product> findAll() {
-        return productRepository.findAll();
+    public Page<Product> findAll(Pageable pageable) {
+        return productRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
 
     @Override

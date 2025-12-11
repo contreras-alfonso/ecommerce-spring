@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.alfonso.ecommerce.entities.Product;
 import org.alfonso.ecommerce.exceptions.EntityNotFoundException;
 import org.alfonso.ecommerce.services.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,8 +21,13 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<Product>> findAll() {
-        return ResponseEntity.ok(productService.findAll());
+    public ResponseEntity<Page<Product>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> products = productService.findAll(pageable);
+        return ResponseEntity.ok(products);
     }
 
     @GetMapping("/{identifier}")
@@ -34,7 +42,6 @@ public class ProductController {
     public ResponseEntity<Product> handleFileUpload(@RequestParam("product") String productJson,
                                                     @RequestParam Map<String, MultipartFile> files) {
 
-        System.out.println("files asda = " + files);
         Product product = productService.save(productJson, files);
         return ResponseEntity.ok(product);
     }

@@ -1,18 +1,10 @@
 package org.alfonso.ecommerce.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "category")
@@ -28,4 +20,13 @@ public class Category {
     @Column(unique = true)
     private String name;
 
+    @Embedded
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    private Audit audit = new Audit();
+
+    public Category(String slug, String name) {
+        this.slug = slug;
+        this.name = name;
+    }
 }

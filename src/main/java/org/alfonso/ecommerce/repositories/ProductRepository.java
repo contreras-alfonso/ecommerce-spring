@@ -1,6 +1,8 @@
 package org.alfonso.ecommerce.repositories;
 
 import org.alfonso.ecommerce.entities.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -9,4 +11,6 @@ public interface ProductRepository extends JpaRepository<Product, String>, SlugE
     boolean existsByNameIgnoreCase(String name);
 
     Optional<Product> findBySlug(String slug);
+
+    Page<Product> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }

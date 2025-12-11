@@ -7,7 +7,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "color")
+@Table(name = "colors")
 public class Color {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
