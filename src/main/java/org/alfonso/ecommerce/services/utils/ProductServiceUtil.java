@@ -1,7 +1,7 @@
 package org.alfonso.ecommerce.services.utils;
 
 import lombok.RequiredArgsConstructor;
-import org.alfonso.ecommerce.dto.ProductCreationDTO;
+import org.alfonso.ecommerce.dto.ProductRequestDto;
 import org.alfonso.ecommerce.entities.Color;
 import org.alfonso.ecommerce.entities.ProductColorImage;
 import org.alfonso.ecommerce.exceptions.MissingFilesException;
@@ -64,17 +64,17 @@ public class ProductServiceUtil {
 
     }
 
-    public ProductCreationDTO parserStringToProductDto(String productString) {
+    public ProductRequestDto parserStringToProductDto(String productString) {
 
-        ProductCreationDTO productCreationDTO;
+        ProductRequestDto productDto;
 
         try {
-            productCreationDTO = objectMapper.readValue(productString, ProductCreationDTO.class);
+            productDto = objectMapper.readValue(productString, ProductRequestDto.class);
         } catch (Exception e) {
             throw new ObjectMappingException("Error al deserializar el JSON del Producto");
         }
 
-        return productCreationDTO;
+        return productDto;
 
     }
 }

@@ -1,6 +1,5 @@
 package org.alfonso.ecommerce.services;
 
-import org.alfonso.ecommerce.dto.ProductCreationDTO;
 import org.alfonso.ecommerce.entities.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

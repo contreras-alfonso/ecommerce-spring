@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class VariantDataDTO {
+public class VariantRequestDto {
 
     private String id;
 

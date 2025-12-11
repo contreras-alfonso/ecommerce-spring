@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductCreationDTO {
+public class ProductRequestDto {
 
     private String id;
 
@@ -29,6 +29,6 @@ public class ProductCreationDTO {
     private String categoryId;
 
     @NotNull(message = "Las variantes de producto son requeridas.")
-    private List<VariantDataDTO> variants;
+    private List<VariantRequestDto> variants;
 
 }

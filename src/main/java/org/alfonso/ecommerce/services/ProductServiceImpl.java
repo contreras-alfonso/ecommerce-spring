@@ -2,8 +2,8 @@ package org.alfonso.ecommerce.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.alfonso.ecommerce.dto.ProductCreationDTO;
-import org.alfonso.ecommerce.dto.VariantDataDTO;
+import org.alfonso.ecommerce.dto.ProductRequestDto;
+import org.alfonso.ecommerce.dto.VariantRequestDto;
 import org.alfonso.ecommerce.entities.*;
 import org.alfonso.ecommerce.exceptions.EntityNotFoundException;
 import org.alfonso.ecommerce.exceptions.ResourceConflictException;
@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
     public Product save(String productJson, Map<String, MultipartFile> files) {
 
         // Parsear el producto a un objeto productDto
-        ProductCreationDTO productDto = productServiceUtil.parserStringToProductDto(productJson);
+        ProductRequestDto productDto = productServiceUtil.parserStringToProductDto(productJson);
 
         // Validar que no exista el nombre del producto
         if (productRepository.existsByNameIgnoreCase(productDto.getName())) {
@@ -83,7 +83,7 @@ public class ProductServiceImpl implements ProductService {
         List<ProductVariant> variants = new ArrayList<>();
 
         // Iterar las variantes y asignar al productToSave
-        for (VariantDataDTO variantDataDTO : productDto.getVariants()) {
+        for (VariantRequestDto variantDataDTO : productDto.getVariants()) {
             colorService.findById(variantDataDTO.getColorId()).ifPresent(colorDb -> {
                 ProductVariant productVariant = new ProductVariant();
                 productVariant.setColor(colorDb);
@@ -121,7 +121,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new EntityNotFoundException("No se encontró el producto buscado."));
 
         // Parsear el producto a un objeto productDto
-        ProductCreationDTO productDto = productServiceUtil.parserStringToProductDto(productJson);
+        ProductRequestDto productDto = productServiceUtil.parserStringToProductDto(productJson);
 
         // Actualizar campos simples
 
@@ -170,7 +170,7 @@ public class ProductServiceImpl implements ProductService {
         List<ProductVariant> updatedVariants = new ArrayList<>();
 
         // Iterar las variantes del productDto
-        for (VariantDataDTO variantDto : productDto.getVariants()) {
+        for (VariantRequestDto variantDto : productDto.getVariants()) {
 
             // Si el id no es null, es un registro existente en la db
             if (variantDto.getId() != null) {
