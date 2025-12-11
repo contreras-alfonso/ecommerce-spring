@@ -29,7 +29,7 @@ public class UploadFileServiceImpl implements UploadFileService {
     public String uploadImage(MultipartFile file, String folderPath) {
         if (file.getSize() > MAX_FILE_SIZE) {
             double maxSizeMb = (double) MAX_FILE_SIZE / (1024 * 1024);
-            throw new FileTooLargeException("El tamaño del archivo excede el límite permitido de " + maxSizeMb);
+            throw new FileTooLargeException("El tamaño del archivo excede el límite permitido de " + maxSizeMb + " MB");
         }
 
         String contentType = file.getContentType();

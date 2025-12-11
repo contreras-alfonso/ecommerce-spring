@@ -7,8 +7,6 @@ import org.alfonso.ecommerce.dto.VariantDataDTO;
 import org.alfonso.ecommerce.entities.*;
 import org.alfonso.ecommerce.exceptions.EntityNotFoundException;
 import org.alfonso.ecommerce.exceptions.ResourceConflictException;
-import org.alfonso.ecommerce.repositories.BrandRepository;
-import org.alfonso.ecommerce.repositories.CategoryRepository;
 import org.alfonso.ecommerce.repositories.ProductRepository;
 import org.alfonso.ecommerce.services.utils.ProductServiceUtil;
 import org.alfonso.ecommerce.utils.GeneralUtil;
@@ -17,8 +15,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.alfonso.ecommerce.entities.ProductColorImage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,9 +26,10 @@ import java.util.*;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
-    private final BrandRepository brandRepository;
+    private final CategoryService categoryService;
+    private final BrandService brandService;
     private final ColorService colorService;
+    private final ProductColorImageService productColorImageService;
     private final ProductServiceUtil productServiceUtil;
 
 
@@ -61,8 +62,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // Buscar y asignar datos al objeto de Product
-        Optional<Category> optionalCategory = categoryRepository.findById(productDto.getCategoryId());
-        Optional<Brand> optionalBrand = brandRepository.findById(productDto.getBrandId());
+        Optional<Category> optionalCategory = categoryService.findById(productDto.getCategoryId());
+        Optional<Brand> optionalBrand = brandService.findById(productDto.getBrandId());
 
         Product productToSave = new Product();
         productToSave.setName(productDto.getName());
@@ -113,4 +114,142 @@ public class ProductServiceImpl implements ProductService {
         return savedProduct;
     }
 
+    @Override
+    public Product update(String id, String productJson, Map<String, MultipartFile> files, List<String> deleteImagesIds) {
+
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No se encontró el producto buscado."));
+
+        // Parsear el producto a un objeto productDto
+        ProductCreationDTO productDto = productServiceUtil.parserStringToProductDto(productJson);
+
+        // Actualizar campos simples
+
+        if (!existingProduct.getName().equals(productDto.getName())) {
+            // Si el nombre cambio validar si el nombre ya está siendo usado
+            productRepository.findByName(productDto.getName()).ifPresent(existProduct -> {
+                if (!existProduct.getId().equals(id)) {
+                    throw new ResourceConflictException("El nombre del producto ya está siendo usado");
+                }
+            });
+
+            existingProduct.setName(productDto.getName());
+            String slug = GeneralUtil.generateSlug(productDto.getName());
+            existingProduct.setSlug(slug);
+        }
+
+        existingProduct.setDescription(productDto.getDescription());
+        existingProduct.setUsesTechnicalVariants(productDto.isUsesTechnicalVariants());
+
+        // Validar si la marca cambió
+        if (existingProduct.getBrand().getId().equals(productDto.getBrandId())) {
+            brandService.findById(productDto.getBrandId()).
+                    ifPresentOrElse(existingProduct::setBrand, () -> {
+                        throw new EntityNotFoundException("No se encontró la marca seleccionada.");
+                    });
+        }
+
+        // Validar si la categoría cambió
+        if (existingProduct.getCategory().getId().equals(productDto.getCategoryId())) {
+            categoryService.findById(productDto.getCategoryId()).
+                    ifPresentOrElse(existingProduct::setCategory, () -> {
+                        throw new EntityNotFoundException("No se encontró la categoría seleccionada.");
+                    });
+        }
+
+        // Obtener variantes actuales del producto en la DB
+        List<ProductVariant> currentVariants = existingProduct.getVariants();
+        // Mapear las variantes por Id -> Data
+        Map<String, ProductVariant> currentVariantsMap = currentVariants.stream()
+                .collect(Collectors.toMap(
+                        ProductVariant::getId,
+                        variant -> variant
+                ));
+
+        // Crear nueva lista de variantes
+        List<ProductVariant> updatedVariants = new ArrayList<>();
+
+        // Iterar las variantes del productDto
+        for (VariantDataDTO variantDto : productDto.getVariants()) {
+
+            // Si el id no es null, es un registro existente en la db
+            if (variantDto.getId() != null) {
+                ProductVariant variantToUpdate = currentVariantsMap.get(variantDto.getId());
+
+                variantToUpdate.setRam(variantDto.getRam());
+                variantToUpdate.setStorage(variantDto.getStorage());
+                variantToUpdate.setPrice(variantDto.getPrice());
+                variantToUpdate.setStock(variantDto.getStock());
+
+                // Si el color no es igual al de la db, actualizar
+                if (!variantToUpdate.getColor().getId().equals(variantDto.getColorId())) {
+                    colorService.findById(variantDto.getColorId())
+                            .ifPresentOrElse(variantToUpdate::setColor,
+                                    () -> {
+                                        throw new EntityNotFoundException("El color no fue encontrado" + variantDto.getColorId());
+                                    });
+                }
+
+                updatedVariants.add(variantToUpdate);
+
+            } else {
+
+                // Si el id es null, crear nueva variante
+                ProductVariant newVariant = new ProductVariant();
+                colorService.findById(variantDto.getColorId())
+                        .ifPresentOrElse(newVariant::setColor,
+                                () -> {
+                                    throw new EntityNotFoundException("El color no fue encontrado: " + variantDto.getColorId());
+                                }
+                        );
+
+                newVariant.setRam(variantDto.getRam());
+                newVariant.setStorage(variantDto.getStorage());
+                newVariant.setPrice(variantDto.getPrice());
+                newVariant.setStock(variantDto.getStock());
+
+                updatedVariants.add(newVariant);
+            }
+        }
+
+        existingProduct.setVariants(updatedVariants);
+
+        //Obtener las imágenes antiguas
+        List<ProductColorImage> currentProductColorImages = existingProduct.getColorImages();
+        //Crear nueva lista de imágenes
+        List<ProductColorImage> updatedProductColorImages = currentProductColorImages;
+
+        // Tratar las imágenes nuevas si es que vienen
+        if (files != null && !files.isEmpty()) {
+
+
+            //Ordenar imágenes por colorId
+            Map<String, List<MultipartFile>> groupFilesByKey = productServiceUtil.groupFilesByKey(files);
+
+            // Subir imágenes a s3 y asignarlas al producto
+            String folderPath = "products/" + existingProduct.getId();
+            List<ProductColorImage> colorImages = productServiceUtil.uploadFilesToS3(groupFilesByKey, folderPath);
+
+            // Agregar las nuevas imágenes
+            updatedProductColorImages.addAll(colorImages);
+
+            // Actualizar las imágenes del producto de la db
+            existingProduct.setColorImages(updatedProductColorImages);
+        }
+
+        if (!deleteImagesIds.isEmpty()) {
+            for (String deleteId : deleteImagesIds) {
+                ProductColorImage productColorImage = productColorImageService.findById(deleteId)
+                        .orElseThrow(() -> new EntityNotFoundException("No se encontró la imagen"));
+
+                // Eliminar imagen del listado
+                updatedProductColorImages.remove(productColorImage);
+            }
+
+            // Actualizar las imágenes del producto de la db
+            existingProduct.setColorImages(updatedProductColorImages);
+        }
+
+        return productRepository.save(existingProduct);
+    }
 }

@@ -46,7 +46,6 @@ public class BrandServiceImpl implements BrandService {
     @Transactional
     public Optional<Brand> update(String id, Brand brand) {
 
-
         return brandRepository.findById(id).map(brandDb -> {
             if (!brand.getName().equals(brandDb.getName())) {
 

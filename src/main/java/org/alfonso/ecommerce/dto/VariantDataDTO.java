@@ -8,6 +8,9 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class VariantDataDTO {
+
+    private String id;
+
     @NotBlank(message = "El ID del color de la variante es requerido.")
     private String colorId;
 

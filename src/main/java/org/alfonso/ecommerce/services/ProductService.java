@@ -18,4 +18,6 @@ public interface ProductService {
 
     Product save(String product, Map<String, MultipartFile> files);
 
+    Product update(String id, String product, Map<String, MultipartFile> files, List<String> deleteImagesIds);
+
 }

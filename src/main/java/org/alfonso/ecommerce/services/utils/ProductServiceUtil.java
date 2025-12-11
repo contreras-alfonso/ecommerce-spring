@@ -43,7 +43,7 @@ public class ProductServiceUtil {
 
     public Map<String, List<MultipartFile>> groupFilesByKey(Map<String, MultipartFile> files) {
         if (files.isEmpty()) {
-            //throw new MissingFilesException("No se enviaron imágenes");
+            throw new MissingFilesException("No se enviaron imágenes");
         }
 
         Map<String, List<MultipartFile>> filesGroupedByColorId = new HashMap<>();

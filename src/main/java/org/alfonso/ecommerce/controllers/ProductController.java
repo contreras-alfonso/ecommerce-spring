@@ -39,11 +39,25 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> handleFileUpload(@RequestParam("product") String productJson,
-                                                    @RequestParam Map<String, MultipartFile> files) {
+    public ResponseEntity<Product> save(@RequestParam("product") String productJson,
+                                        @RequestParam Map<String, MultipartFile> files) {
 
         Product product = productService.save(productJson, files);
         return ResponseEntity.ok(product);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(
+            @PathVariable String id,
+            @PathVariable("product") String productJson,
+            @PathVariable(required = false) Map<String, MultipartFile> newFiles,
+            @PathVariable(required = false) List<String> deleteImagesIds
+
+    ) {
+
+        Product updatedProduct = productService.update(id, productJson, newFiles, deleteImagesIds);
+        return ResponseEntity.ok(updatedProduct);
+
     }
 
 
