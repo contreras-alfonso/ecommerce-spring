@@ -26,6 +26,12 @@ public class Brand {
     @Getter(AccessLevel.NONE)
     private Audit audit = new Audit();
 
+    public Brand(String id, String name, String slug) {
+        this.id = id;
+        this.name = name;
+        this.slug = slug;
+    }
+
     public Brand(String name, String slug) {
         this.name = name;
         this.slug = slug;

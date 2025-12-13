@@ -1,6 +1,5 @@
 package org.alfonso.ecommerce.repositories;
 
-import jakarta.validation.constraints.NotBlank;
 import org.alfonso.ecommerce.entities.Brand;
 import org.springframework.data.jpa.repository.JpaRepository;
 

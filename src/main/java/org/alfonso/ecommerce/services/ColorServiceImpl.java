@@ -1,6 +1,5 @@
 package org.alfonso.ecommerce.services;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.alfonso.ecommerce.entities.Color;
 import org.alfonso.ecommerce.repositories.ColorRepository;

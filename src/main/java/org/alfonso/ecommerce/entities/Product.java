@@ -44,19 +44,4 @@ public class Product extends Auditable {
     @JoinColumn(name = "product_id")
     private List<ProductColorImage> colorImages = new ArrayList<>();
 
-    /*@Embedded
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    private Audit audit = new Audit();
-
-    public Product(String name, String slug, String description, boolean usesTechnicalVariants, Category category, Brand brand, List<ProductVariant> variants, List<ProductColorImage> colorImages) {
-        this.name = name;
-        this.slug = slug;
-        this.description = description;
-        this.usesTechnicalVariants = usesTechnicalVariants;
-        this.category = category;
-        this.brand = brand;
-        this.variants = variants;
-        this.colorImages = colorImages;
-    }*/
 }
