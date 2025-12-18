@@ -1,14 +1,15 @@
 package org.alfonso.ecommerce.controllers;
 
+import org.alfonso.ecommerce.entities.Error;
 import org.alfonso.ecommerce.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.lang.module.ResolutionException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -77,5 +78,59 @@ public class GlobalExceptionHandler {
         errorResponse.put("fieldErrors", errors);
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({BadCredentialsException.class})
+    public ResponseEntity<Error> handleBadCredentials(BadCredentialsException ex) {
+        Error error = new Error();
+        error.setError(ex.getMessage());
+        error.setMsg("Usuario o contraseña incorrecta");
+        error.setStatus(HttpStatus.UNAUTHORIZED.value());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(error);
+    }
+
+    @ExceptionHandler({UserNotFoundException.class})
+    public ResponseEntity<Error> handleUserNotFound(UserNotFoundException ex) {
+        Error error = new Error();
+        error.setError(ex.getMessage());
+        error.setMsg("Usuario no encontrado");
+        error.setStatus(HttpStatus.NOT_FOUND.value());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(error);
+    }
+
+    @ExceptionHandler({InvalidRefreshToken.class})
+    public ResponseEntity<Error> handleInvalidRefreshToken(InvalidRefreshToken ex) {
+        Error error = new Error();
+        error.setError(ex.getMessage());
+        error.setMsg("Token refresh inválido");
+        error.setStatus(HttpStatus.UNAUTHORIZED.value());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(error);
+    }
+
+    @ExceptionHandler({UserAlreadyExists.class})
+    public ResponseEntity<Error> handleUserAlreadyExists(UserAlreadyExists ex) {
+        Error error = new Error();
+        error.setError(ex.getMessage());
+        error.setMsg("El correo ya está siendo usado. Por favor, utilice uno distinto");
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(error);
+    }
+
+    @ExceptionHandler({InvalidJwtTokenException.class})
+    public ResponseEntity<Error> handleInvalidJwtToken(InvalidJwtTokenException ex) {
+        Error error = new Error();
+        error.setError(ex.getMessage());
+        error.setMsg("El token proporcionado es inválido o ha expirado");
+        error.setStatus(HttpStatus.UNAUTHORIZED.value());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(error);
+    }
+
+    @ExceptionHandler({MissingAuthorizationHeaderException.class})
+    public ResponseEntity<Error> handleMissingAuthorization(MissingAuthorizationHeaderException ex) {
+        Error error = new Error();
+        error.setError(ex.getMessage());
+        error.setMsg("Token no proporcionado");
+        error.setStatus(HttpStatus.UNAUTHORIZED.value());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(error);
     }
 }
