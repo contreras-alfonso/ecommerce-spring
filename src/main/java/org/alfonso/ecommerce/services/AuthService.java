@@ -73,7 +73,7 @@ public class AuthService {
     }
 
     public AuthResponse refreshToken(@Valid RefreshTokenRequest request) {
-        String refreshToken = request.getRefreshToken();
+        String refreshToken = request.getToken();
         //check if it is valid refresh token
         if (!jwtService.isRefreshToken(refreshToken)) {
             throw new InvalidRefreshToken("Invalid refresh token");
