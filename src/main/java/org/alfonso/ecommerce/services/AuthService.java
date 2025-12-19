@@ -39,7 +39,7 @@ public class AuthService {
             throw new UserAlreadyExists("User already exists");
         }
 
-        User user = User.builder().name(registerRequest.getName()).lastname(registerRequest.getLastname()).documentType(registerRequest.getDocumentType()).documentNumber(registerRequest.getDocumentNumber()).password(passwordEncoder.encode(registerRequest.getPassword())).email(registerRequest.getEmail()).role(Role.ROLE_ADMIN).build();
+        User user = User.builder().name(registerRequest.getName()).lastname(registerRequest.getLastname()).documentType(registerRequest.getDocumentType()).documentNumber(registerRequest.getDocumentNumber()).password(passwordEncoder.encode(registerRequest.getPassword())).email(registerRequest.getEmail()).role(Role.ROLE_USER).build();
 
         userRepository.save(user);
     }
@@ -74,10 +74,6 @@ public class AuthService {
 
     public AuthResponse refreshToken(@Valid RefreshTokenRequest request) {
         String refreshToken = request.getToken();
-        //check if it is valid refresh token
-        if (!jwtService.isRefreshToken(refreshToken)) {
-            throw new InvalidRefreshToken("Invalid refresh token");
-        }
 
         String user = jwtService.extractUsernameFromToken(refreshToken);
         UserDetails userDetails = userDetailsService.loadUserByUsername(user);

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,19 +37,23 @@ public class ProductController {
         ProductFilters request = new ProductFilters(
                 brandIds, minPrice, maxPrice, sort, page, size
         );
-        System.out.println("request = " + request);
         ProductSearchResponse response = productSearchService.search(request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/pagination")
-    public ResponseEntity<Page<Product>> findAll(
+    public ResponseEntity<Page<Product>> findByPagination(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Product> products = productService.findAll(pageable);
+        Page<Product> products = productService.findByPagination(pageable);
         return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Product>> findAll() {
+        return ResponseEntity.ok(productService.findAll());
     }
 
     @GetMapping("/{identifier}")
@@ -60,6 +65,7 @@ public class ProductController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Product> save(@RequestParam("product") String productJson,
                                         @RequestParam Map<String, MultipartFile> files) {
 
@@ -68,6 +74,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> update(
             @PathVariable String id,
             @RequestParam("product") String productJson,

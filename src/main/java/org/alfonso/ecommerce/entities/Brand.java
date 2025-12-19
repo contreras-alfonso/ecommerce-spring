@@ -6,9 +6,10 @@ import lombok.*;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "brands")
-public class Brand {
+public class Brand extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "VARCHAR(36)")
@@ -20,17 +21,6 @@ public class Brand {
 
     @Column(unique = true)
     private String slug;
-
-    @Embedded
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    private Audit audit = new Audit();
-
-    public Brand(String id, String name, String slug) {
-        this.id = id;
-        this.name = name;
-        this.slug = slug;
-    }
 
     public Brand(String name, String slug) {
         this.name = name;

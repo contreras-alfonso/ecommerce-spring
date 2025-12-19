@@ -3,9 +3,11 @@ package org.alfonso.ecommerce.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.alfonso.ecommerce.entities.Color;
+import org.alfonso.ecommerce.exceptions.EntityNotFoundException;
 import org.alfonso.ecommerce.services.ColorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -29,17 +31,14 @@ public class ColorController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> save(@Valid @RequestBody Color color) {
         return ResponseEntity.status(HttpStatus.CREATED).body(colorService.save(color));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> update(@Valid @RequestBody Color color, @PathVariable String id) {
-        Optional<Color> optionalColor = colorService.update(id, color);
-        if (optionalColor.isPresent()) {
-            return ResponseEntity.ok(optionalColor.get());
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("msg", "Color no encontrado"));
+        return colorService.update(id, color).map(ResponseEntity::ok).orElseThrow(() -> new EntityNotFoundException("El color no fue encontrado"));
     }
-
 }

@@ -11,7 +11,9 @@ import java.util.Optional;
 
 public interface ProductService {
 
-    Page<Product> findAll(Pageable pageable);
+    Page<Product> findByPagination(Pageable pageable);
+
+    List<Product> findAll();
 
     Optional<Product> findById(String identifier);
 

@@ -6,9 +6,10 @@ import lombok.*;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "colors")
-public class Color {
+public class Color extends Auditable{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "VARCHAR(36)")
@@ -19,11 +20,6 @@ public class Color {
 
     @NotBlank(message = "El color hexadecimal es requerido")
     private String hex;
-
-    @Embedded
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    private Audit audit = new Audit();
 
     public Color(String name, String hex) {
         this.name = name;
