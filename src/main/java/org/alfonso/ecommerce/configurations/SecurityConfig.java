@@ -5,6 +5,7 @@ import org.alfonso.ecommerce.exceptions.CustomAccessDeniedHandler;
 import org.alfonso.ecommerce.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -57,6 +58,9 @@ public class SecurityConfig {
                 .cors(cors-> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/api/auth/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories", "/api/categories/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/brands", "/api/brands/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/colors", "/api/colors/*").permitAll()
                         .anyRequest().authenticated()
 
                 )

@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class ProductSearchService {
     private final ProductSearchRepository productSearchRepository;
 
-    public ProductSearchResponse search(ProductFilters request) {
+    public ProductSearchResponse search(String categorySlug, ProductFilters request) {
         // validación de sort
         String sort = Optional.ofNullable(request.getSort())
                 .filter(s -> s.matches("price_asc|price_desc|created_asc"))
@@ -38,6 +38,7 @@ public class ProductSearchService {
 
         // Buscar productos
         Page<ProductListItemProjection> productPage = productSearchRepository.findProducts(
+                categorySlug,
                 request.getBrandIds(),
                 request.getMinPrice(),
                 request.getMaxPrice(),
@@ -50,6 +51,7 @@ public class ProductSearchService {
 
         // Obtener filtros disponibles
         AvailableFilters filters = getAvailableFilters(
+                categorySlug,
                 request.getBrandIds(),
                 request.getMinPrice(),
                 request.getMaxPrice()
@@ -74,11 +76,12 @@ public class ProductSearchService {
     }
 
     private AvailableFilters getAvailableFilters(
+            String categorySlug,
             List<String> brandIds,
             Double minPrice,
             Double maxPrice
     ) {
-        List<FiltersListProjection> availableFilters = productSearchRepository.findAvailableFilters(brandIds, minPrice, maxPrice);
+        List<FiltersListProjection> availableFilters = productSearchRepository.findAvailableFilters(categorySlug, brandIds, minPrice, maxPrice);
 
         if (availableFilters.isEmpty()) {
             return new AvailableFilters(null, null, List.of());

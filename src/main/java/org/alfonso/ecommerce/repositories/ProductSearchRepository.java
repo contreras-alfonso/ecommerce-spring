@@ -29,14 +29,16 @@ public interface ProductSearchRepository extends JpaRepository<Product, String> 
             WHERE (:brandIds IS NULL OR p.brand.id IN :brandIds)
             AND (:minPrice IS NULL OR v.price >= :minPrice)
             AND (:maxPrice IS NULL OR v.price <= :maxPrice)
+            AND (p.category.slug = :categorySlug)
             GROUP BY p.id, p.brand.id
-            ORDER BY 
+            ORDER BY
                CASE WHEN :sort = 'price_asc' THEN MIN(v.price) END ASC,
-               CASE WHEN :sort = 'price_desc' THEN MIN(v.price) END ASC,
+               CASE WHEN :sort = 'price_desc' THEN MIN(v.price) END DESC,
                CASE WHEN :sort = 'created_desc' OR :sort IS NULL THEN p.createdAt END DESC
             
             """)
     Page<ProductListItemProjection> findProducts(
+            String categorySlug,
             List<String> brandIds,
             Double minPrice,
             Double maxPrice,
@@ -54,13 +56,15 @@ public interface ProductSearchRepository extends JpaRepository<Product, String> 
             FROM Product p
             JOIN p.variants v
             WHERE (:brandIds IS NULL OR p.brand.id IN :brandIds)
+            AND (p.category.slug = :categorySlug)
             AND (:minPrice IS NULL OR v.price >= :minPrice)
             GROUP BY p.brand.id, p.brand.name
             """)
     List<FiltersListProjection> findAvailableFilters(
-            @Param("brandIds") List<String> brandIds,
-            @Param("minPrice") Double minPrice,
-            @Param("maxPrice") Double maxPrice
+            String categorySlug,
+            List<String> brandIds,
+            Double minPrice,
+            Double maxPrice
     );
 
 }

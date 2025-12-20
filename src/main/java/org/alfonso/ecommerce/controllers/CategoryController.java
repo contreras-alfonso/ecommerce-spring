@@ -28,7 +28,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable String id) {
         Optional<Category> optionalCategory = categoryService.findById(id);
-        return optionalCategory.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return optionalCategory.map(ResponseEntity::ok).orElseThrow(()-> new EntityNotFoundException("Categoría no encontrada"));
     }
 
     @PostMapping

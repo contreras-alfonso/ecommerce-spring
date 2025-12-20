@@ -25,8 +25,9 @@ public class ProductController {
     private final ProductService productService;
     private final ProductSearchService productSearchService;
 
-    @GetMapping
+    @GetMapping("/by/{categorySlug}")
     public ResponseEntity<ProductSearchResponse> searchProducts(
+            @PathVariable String categorySlug,
             @RequestParam(required = false) List<String> brandIds,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
@@ -37,7 +38,7 @@ public class ProductController {
         ProductFilters request = new ProductFilters(
                 brandIds, minPrice, maxPrice, sort, page, size
         );
-        ProductSearchResponse response = productSearchService.search(request);
+        ProductSearchResponse response = productSearchService.search(categorySlug, request);
         return ResponseEntity.ok(response);
     }
 

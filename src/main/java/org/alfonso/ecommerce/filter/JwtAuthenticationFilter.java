@@ -10,6 +10,7 @@ import org.alfonso.ecommerce.exceptions.InvalidJwtTokenException;
 import org.alfonso.ecommerce.exceptions.MissingAuthorizationHeaderException;
 import org.alfonso.ecommerce.services.JwtService;
 import org.alfonso.ecommerce.utils.JwtErrorResponseWriter;
+import org.alfonso.ecommerce.utils.PublicEndpoints;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,9 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
 
-            String path = request.getServletPath();
-
-            if (path.startsWith("/api/auth/")) {
+            if (PublicEndpoints.isPublic(request)) {
                 filterChain.doFilter(request, response);
                 return;
             }

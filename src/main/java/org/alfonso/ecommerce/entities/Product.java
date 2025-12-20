@@ -24,6 +24,7 @@ public class Product extends Auditable {
     @Column(unique = true, nullable = false)
     private String slug;
 
+    @Lob
     private String description;
 
     @Column(name = "uses_technical_variants")
