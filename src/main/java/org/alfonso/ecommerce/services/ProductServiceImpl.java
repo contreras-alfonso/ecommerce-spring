@@ -2,16 +2,19 @@ package org.alfonso.ecommerce.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.alfonso.ecommerce.dto.ProductRequestDto;
-import org.alfonso.ecommerce.dto.VariantRequestDto;
+import org.alfonso.ecommerce.dto.*;
 import org.alfonso.ecommerce.entities.*;
 import org.alfonso.ecommerce.exceptions.EntityNotFoundException;
 import org.alfonso.ecommerce.exceptions.ResourceConflictException;
 import org.alfonso.ecommerce.repositories.ProductRepository;
+import org.alfonso.ecommerce.repositories.specifications.ProductSpecification;
 import org.alfonso.ecommerce.services.utils.ProductServiceUtil;
 import org.alfonso.ecommerce.utils.GeneralUtil;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +34,78 @@ public class ProductServiceImpl implements ProductService {
     private final ColorService colorService;
     private final ProductColorImageService productColorImageService;
     private final ProductServiceUtil productServiceUtil;
+
+
+    @Transactional(readOnly = true)
+    public ProductSearchResponse findProducts(
+            String categorySlug,
+            String brandIds,
+            Double minPrice,
+            Double maxPrice,
+            String sort,
+            int page,
+            int size
+    ) {
+
+
+        List<String> brandIdList = brandIds != null ?
+                Arrays.asList(brandIds.split(","))
+                : null;
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                resolveSort(sort)
+        );
+
+        Specification<Product> spec =
+                ProductSpecification.filter(
+                        categorySlug,
+                        brandIdList,
+                        minPrice,
+                        maxPrice
+                );
+
+        Page<Product> products = productRepository.findAll(spec, pageable);
+        AvailableFilters availableFilters = getAvailableFilters(categorySlug,
+                brandIdList,
+                minPrice,
+                maxPrice);
+
+        return new ProductSearchResponse(products, availableFilters);
+
+    }
+
+    public AvailableFilters getAvailableFilters(
+            String categorySlug,
+            List<String> brandIds,
+            Double minPrice,
+            Double maxPrice
+    ) {
+        Object[] result =
+                productRepository.findMinMaxPrice(
+                        categorySlug,
+                        brandIds,
+                        minPrice,
+                        maxPrice
+                );
+
+        Object[] values = (Object[]) result[0];
+
+        Double min = values[0] != null ? ((Number) values[0]).doubleValue() : null;
+        Double max = values[1] != null ? ((Number) values[1]).doubleValue() : null;
+
+
+        List<BrandCountDto> brands =
+                productRepository.findAvailableBrands(
+                        categorySlug,
+                        brandIds,
+                        minPrice,
+                        maxPrice
+                );
+
+        return new AvailableFilters(min, max, brands);
+    }
 
 
     @Override
@@ -121,6 +196,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Product update(String id, String productJson, Map<String, MultipartFile> files, List<String> deleteImagesIds) {
 
         Product existingProduct = productRepository.findById(id)
@@ -256,5 +332,15 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return productRepository.save(existingProduct);
+    }
+
+
+    private Sort resolveSort(String sort) {
+        return switch (sort) {
+            case "created_asc" -> Sort.by("createdAt").ascending();
+            case "price_asc" -> Sort.by("variants.price").ascending();
+            case "price_desc" -> Sort.by("variants.price").descending();
+            default -> Sort.by("createdAt").descending();
+        };
     }
 }

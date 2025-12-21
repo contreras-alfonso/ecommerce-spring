@@ -1,11 +1,9 @@
 package org.alfonso.ecommerce.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.alfonso.ecommerce.dto.ProductFilters;
 import org.alfonso.ecommerce.dto.ProductSearchResponse;
 import org.alfonso.ecommerce.entities.Product;
 import org.alfonso.ecommerce.exceptions.EntityNotFoundException;
-import org.alfonso.ecommerce.services.ProductSearchService;
 import org.alfonso.ecommerce.services.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,23 +21,19 @@ import java.util.*;
 public class ProductController {
 
     private final ProductService productService;
-    private final ProductSearchService productSearchService;
 
     @GetMapping("/by/{categorySlug}")
-    public ResponseEntity<ProductSearchResponse> searchProducts(
+    public ResponseEntity<?> searchProducts(
             @PathVariable String categorySlug,
-            @RequestParam(required = false) List<String> brandIds,
+            @RequestParam(required = false) String brandIds,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
             @RequestParam(defaultValue = "created_desc") String sort,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "2") int size
     ) {
-        ProductFilters request = new ProductFilters(
-                brandIds, minPrice, maxPrice, sort, page, size
-        );
-        ProductSearchResponse response = productSearchService.search(categorySlug, request);
-        return ResponseEntity.ok(response);
+        ProductSearchResponse products = productService.findProducts(categorySlug, brandIds, minPrice, maxPrice, sort, page, size);
+        return ResponseEntity.ok(products);
     }
 
     @GetMapping("/pagination")

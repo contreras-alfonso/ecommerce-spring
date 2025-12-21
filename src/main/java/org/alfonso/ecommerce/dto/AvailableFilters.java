@@ -13,5 +13,5 @@ import java.util.List;
 public class AvailableFilters {
     private Double minPrice;
     private Double maxPrice;
-    List<Brand> brands;
+    List<BrandCountDto> brands;
 }
