@@ -27,11 +27,11 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
                 WHERE (:categorySlug IS NULL OR p.category.slug = :categorySlug)
                   AND (:minPrice IS NULL OR v.price >= :minPrice)
                   AND (:maxPrice IS NULL OR v.price <= :maxPrice)
-                  AND (:brandIds IS NULL OR p.brand.id IN :brandIds)
+                  AND (:brandId IS NULL OR p.brand.id = :brandId)
             """)
     Object[] findMinMaxPrice(
             String categorySlug,
-            List<String> brandIds,
+            String brandId,
             Double minPrice,
             Double maxPrice
     );
@@ -49,12 +49,13 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
                 WHERE (:categorySlug IS NULL OR p.category.slug = :categorySlug)
                   AND (:minPrice IS NULL OR v.price >= :minPrice)
                   AND (:maxPrice IS NULL OR v.price <= :maxPrice)
+                  AND (:brandId IS NULL OR b.id = :brandId)
                 GROUP BY b.id, b.name, b.slug
                 ORDER BY b.name
             """)
     List<BrandCountDto> findAvailableBrands(
             String categorySlug,
-            List<String> brandIds,
+            String brandId,
             Double minPrice,
             Double maxPrice
     );

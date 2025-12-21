@@ -25,14 +25,14 @@ public class ProductController {
     @GetMapping("/by/{categorySlug}")
     public ResponseEntity<?> searchProducts(
             @PathVariable String categorySlug,
-            @RequestParam(required = false) String brandIds,
+            @RequestParam(required = false) String brandId,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
             @RequestParam(defaultValue = "created_desc") String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "2") int size
     ) {
-        ProductSearchResponse products = productService.findProducts(categorySlug, brandIds, minPrice, maxPrice, sort, page, size);
+        ProductSearchResponse products = productService.findProducts(categorySlug, brandId, minPrice, maxPrice, sort, page, size);
         return ResponseEntity.ok(products);
     }
 

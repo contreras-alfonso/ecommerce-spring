@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface ProductService {
 
     ProductSearchResponse findProducts(String categorySlug,
-                                       String brandIds,
+                                       String brandId,
                                        Double minPrice,
                                        Double maxPrice,
                                        String sort,

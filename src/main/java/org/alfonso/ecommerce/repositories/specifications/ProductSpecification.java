@@ -14,7 +14,7 @@ import jakarta.persistence.criteria.Predicate;
 public class ProductSpecification {
     public static Specification<Product> filter(
             String categorySlug,
-            List<String> brandIds,
+            String brandId,
             Double minPrice,
             Double maxPrice
     ) {
@@ -31,10 +31,10 @@ public class ProductSpecification {
                 );
             }
 
-            if (brandIds != null && !brandIds.isEmpty()) {
+            if (brandId != null) {
                 Join<Product, Brand> brandJoin = root.join("brand");
                 predicates.add(
-                        brandJoin.get("id").in(brandIds)
+                        cb.equal(brandJoin.get("id"), brandId)
                 );
             }
 

@@ -39,7 +39,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public ProductSearchResponse findProducts(
             String categorySlug,
-            String brandIds,
+            String brandId,
             Double minPrice,
             Double maxPrice,
             String sort,
@@ -47,10 +47,6 @@ public class ProductServiceImpl implements ProductService {
             int size
     ) {
 
-
-        List<String> brandIdList = brandIds != null ?
-                Arrays.asList(brandIds.split(","))
-                : null;
 
         Pageable pageable = PageRequest.of(
                 page,
@@ -61,14 +57,14 @@ public class ProductServiceImpl implements ProductService {
         Specification<Product> spec =
                 ProductSpecification.filter(
                         categorySlug,
-                        brandIdList,
+                        brandId,
                         minPrice,
                         maxPrice
                 );
 
         Page<Product> products = productRepository.findAll(spec, pageable);
         AvailableFilters availableFilters = getAvailableFilters(categorySlug,
-                brandIdList,
+                brandId,
                 minPrice,
                 maxPrice);
 
@@ -78,14 +74,14 @@ public class ProductServiceImpl implements ProductService {
 
     public AvailableFilters getAvailableFilters(
             String categorySlug,
-            List<String> brandIds,
+            String brandId,
             Double minPrice,
             Double maxPrice
     ) {
         Object[] result =
                 productRepository.findMinMaxPrice(
                         categorySlug,
-                        brandIds,
+                        brandId,
                         minPrice,
                         maxPrice
                 );
@@ -99,7 +95,7 @@ public class ProductServiceImpl implements ProductService {
         List<BrandCountDto> brands =
                 productRepository.findAvailableBrands(
                         categorySlug,
-                        brandIds,
+                        brandId,
                         minPrice,
                         maxPrice
                 );
