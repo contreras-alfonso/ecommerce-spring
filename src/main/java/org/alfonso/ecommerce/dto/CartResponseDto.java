@@ -8,4 +8,5 @@ import java.util.List;
 public class CartResponseDto {
     private String cartId;
     private List<CartItemDto> items;
+    private Double subtotal;
 }

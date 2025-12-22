@@ -1,6 +1,7 @@
 package org.alfonso.ecommerce.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.alfonso.ecommerce.dto.CartResponseDto;
 import org.alfonso.ecommerce.dto.VerifyStockRequest;
 import org.alfonso.ecommerce.services.CartService;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +22,8 @@ public class CartController {
     public ResponseEntity<?> verifyStock(
             @RequestBody VerifyStockRequest verifyStockRequest
     ) {
-        productVariantService.checkStockAndUpdateCart(verifyStockRequest);
-        return ResponseEntity.ok(
-                Map.of("msg", "Stock disponible")
-        );
+        CartResponseDto response = productVariantService.checkStockAndUpdateCart(verifyStockRequest);
+        return ResponseEntity.ok(response);
 
     }
 

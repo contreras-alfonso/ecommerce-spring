@@ -17,14 +17,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "product_variants")
-public class ProductVariant extends Auditable{
+public class ProductVariant extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "VARCHAR(36)")
     private String id;
 
+
     private String ram;
-    
+
     private String storage;
 
     private Double price;
@@ -34,5 +35,10 @@ public class ProductVariant extends Auditable{
     @ManyToOne
     @JoinColumn(name = "color_id")
     private Color color;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
 
 }
