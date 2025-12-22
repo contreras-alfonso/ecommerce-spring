@@ -36,6 +36,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductServiceUtil productServiceUtil;
 
 
+    @Override
     @Transactional(readOnly = true)
     public ProductSearchResponse findProducts(
             String categorySlug,

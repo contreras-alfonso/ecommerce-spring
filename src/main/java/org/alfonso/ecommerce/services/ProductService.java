@@ -1,5 +1,6 @@
 package org.alfonso.ecommerce.services;
 
+import org.alfonso.ecommerce.dto.AvailableFilters;
 import org.alfonso.ecommerce.dto.ProductSearchResponse;
 import org.alfonso.ecommerce.entities.Product;
 import org.springframework.data.domain.Page;

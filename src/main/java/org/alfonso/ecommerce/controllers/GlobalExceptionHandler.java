@@ -80,6 +80,25 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NoStockAvailableException.class)
+    public ResponseEntity<Map<String, Object>> handleNoStockAvailableException(NoStockAvailableException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("status", HttpStatus.CONFLICT.value());
+        errorResponse.put("msg", ex.getMessage());
+        errorResponse.put("error", "OUT_OF_STOCK");
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
+        errorResponse.put("msg", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
     @ExceptionHandler({BadCredentialsException.class})
     public ResponseEntity<Error> handleBadCredentials(BadCredentialsException ex) {
         Error error = new Error();
