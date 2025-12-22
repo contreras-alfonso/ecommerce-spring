@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class VerifyStockRequest {
+    private String cartId;
     private String variantId;
     private int quantity;
 }
