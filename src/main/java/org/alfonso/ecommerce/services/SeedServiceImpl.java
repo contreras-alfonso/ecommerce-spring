@@ -21,45 +21,40 @@ public class SeedServiceImpl implements SeedService {
     private final ColorRepository colorRepository;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
-    private final ProductService productService;
 
     @Override
     @Transactional
     public void seed() {
-        Color color1 = new Color("Rojo", "#F54927");
-        Color color2 = new Color("Azul", "#4359F7");
-        Color savedColor1 = colorRepository.save(color1);
-        Color savedColor2 = colorRepository.save(color2);
+        Color color1 = new Color("Negro", "#454545");
+        Color color2 = new Color("Blanco", "#FAFAFA");
+        Color color3 = new Color("Menta", "#EAF5E1");
+        colorRepository.save(color1);
+        colorRepository.save(color2);
+        colorRepository.save(color3);
 
-        Brand brand1 = new Brand("xiaomi pro", "xiaomi-pro");
-        Brand savedBrand1 = brandRepository.save(brand1);
+        Brand brand1 = new Brand("Xiaomi", "xiaomi");
+        brandRepository.save(brand1);
 
-        Category category1 = new Category("celulares", "nada");
-        Category savedCategory1 = categoryRepository.save(category1);
+        Brand apple = new Brand("Apple", "apple");
+        brandRepository.save(apple);
 
+        Brand asus = new Brand("Asus", "asus");
+        brandRepository.save(asus);
 
-        for (int i = 0; i < 30; i++) {
+        Brand brand2 = new Brand("Samsung", "samsung");
+        brandRepository.save(brand2);
 
-            String stringProduct = "{\n" +
-                    "  \"name\": \"Tablet xiaomi " +  (i + 1) + "\""+ ",\n" +
-                    "  \"description\": \"Tablet potente\",\n" +
-                    "  \"brandId\": " + "\"" + savedBrand1.getId() + "\"" + ",\n" +
-                    "  \"categoryId\": " + "\"" + savedCategory1.getId() + "\"" + ",\n" +
-                    "  \"usesTechnicalVariants\": true,\n" +
-                    "  \"colors\": [\n" +
-                    "    { \"colorId\": " + "\"" +  savedColor1.getId() + "\"" + " },\n" +
-                    "    { \"colorId\": " + "\"" + savedColor2.getId() + "\"" + " }\n" +
-                    "  ],\n" +
-                    "  \"variants\": [\n" +
-                    "    { \"colorId\": " + "\"" +  savedColor1.getId() + "\"" + ", \"ram\": \"8GB\", \"storage\": \"256GB\", \"price\": 850, \"stock\": 10 },\n" +
-                    "    { \"colorId\": " + "\"" +  savedColor2.getId() + "\"" + ", \"ram\": \"8GB\", \"storage\": \"256GB\", \"price\": 860, \"stock\": 8 }\n" +
-                    "  ]\n" +
-                    "}\n";
+        Brand brand3 = new Brand("OnePlus", "one-plus");
+        brandRepository.save(brand3);
 
-            Map<String, MultipartFile> files = new HashMap<>();
-            productService.save(stringProduct, files);
-        }
+        Category category1 = new Category("Celulares", "celulares");
+        categoryRepository.save(category1);
 
+        Category category2 = new Category("Audífonos", "audifonos");
+        categoryRepository.save(category2);
+
+        Category category3 = new Category("Relojes", "relojes");
+        categoryRepository.save(category3);
 
     }
 }

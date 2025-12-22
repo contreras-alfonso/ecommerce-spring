@@ -38,12 +38,27 @@ public class Product extends Auditable {
     @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_id")
-    private List<ProductVariant> variants;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariant> variants = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_id")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductColorImage> colorImages = new ArrayList<>();
+
+    public void addVariant(ProductVariant variant) {
+        variants.add(variant);
+        variant.setProduct(this);
+    }
+    public void removeVariant(ProductVariant variant) {
+        variants.remove(variant);
+        variant.setProduct(null);
+    }
+    public void addColorImage(ProductColorImage colorImage) {
+        colorImages.add(colorImage);
+        colorImage.setProduct(this);
+    }
+    public void removeColorImage(ProductColorImage colorImage) {
+        colorImages.remove(colorImage);
+        colorImage.setProduct(null);
+    }
 
 }

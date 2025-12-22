@@ -21,6 +21,14 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
     Optional<Product> findByName(String name);
 
     @Query("""
+                SELECT p
+                FROM Product p
+                LEFT JOIN FETCH p.variants
+                LEFT JOIN FETCH p.colorImages
+            """)
+    List<Product> findAllWithVariantsAndImages();
+
+    @Query("""
                 SELECT MIN(v.price), MAX(v.price)
                 FROM Product p
                 JOIN p.variants v

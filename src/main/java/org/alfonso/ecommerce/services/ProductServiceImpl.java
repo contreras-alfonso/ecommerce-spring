@@ -169,14 +169,18 @@ public class ProductServiceImpl implements ProductService {
                 productVariant.setRam(variantDataDTO.getRam());
                 productVariant.setStorage(variantDataDTO.getStorage());
                 productVariant.setStock(variantDataDTO.getStock());
-                variants.add(productVariant);
+                // TODO
+                productToSave.addVariant(productVariant);
+                //variants.add(productVariant);
             });
         }
-
-        productToSave.setVariants(variants);
+        // TODO
+        //productToSave.setVariants(variants);
 
         // Guardar el producto
         Product savedProduct = productRepository.save(productToSave);
+
+        System.out.println("savedProduct.getId() = " + savedProduct.getId());
 
         //Ordenar imágenes por colorId
         Map<String, List<MultipartFile>> groupFilesByKey = productServiceUtil.groupFilesByKey(files);
@@ -184,7 +188,10 @@ public class ProductServiceImpl implements ProductService {
         // Subir imágenes a s3 y asignarlas al producto
         String folderPath = "products/" + savedProduct.getId();
         List<ProductColorImage> colorImages = productServiceUtil.uploadFilesToS3(groupFilesByKey, folderPath);
-        savedProduct.setColorImages(colorImages);
+
+        // TODO
+        colorImages.forEach(savedProduct::addColorImage);
+        //savedProduct.setColorImages(colorImages);
 
         // Guardar el producto con las imágenes
         productRepository.save(savedProduct);

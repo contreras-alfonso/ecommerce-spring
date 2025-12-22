@@ -31,7 +31,9 @@ public class ProductServiceUtil {
 
                 for (MultipartFile file : entry.getValue()) {
                     String pathS3 = uploadFileService.uploadImage(file, folderPath);
-                    ProductColorImage productColorImage = new ProductColorImage(null, pathS3, colorDb);
+                    ProductColorImage productColorImage = new ProductColorImage();
+                    productColorImage.setUrl(pathS3);
+                    productColorImage.setColor(colorDb);
                     colorImages.add(productColorImage);
                 }
             }

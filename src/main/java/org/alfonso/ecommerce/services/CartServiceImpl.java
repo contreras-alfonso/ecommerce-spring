@@ -3,6 +3,7 @@ package org.alfonso.ecommerce.services;
 import lombok.RequiredArgsConstructor;
 import org.alfonso.ecommerce.dto.CartItemDto;
 import org.alfonso.ecommerce.dto.CartResponseDto;
+import org.alfonso.ecommerce.dto.RemoveItemCartRequest;
 import org.alfonso.ecommerce.dto.VerifyStockRequest;
 import org.alfonso.ecommerce.entities.*;
 import org.alfonso.ecommerce.exceptions.EntityNotFoundException;
@@ -45,7 +46,7 @@ public class CartServiceImpl implements CartService {
             // Si el item del carrito ya existía, validar por su el stock de la db + stock request
             if (findCartItem.isPresent()) {
                 CartItem cartItemDb = findCartItem.get();
-                Integer totalQuantity = cartItemDb.getQuantity() + stockRequest.getQuantity();
+                Integer totalQuantity = stockRequest.getQuantity();
                 verifyStock(stockRequest.getVariantId(), totalQuantity);
                 cartItemDb.setQuantity(totalQuantity);
             } else {
@@ -73,6 +74,22 @@ public class CartServiceImpl implements CartService {
             Cart savedCart = cartRepository.save(cart);
             return getCartResponseDto(savedCart);
         }
+
+    }
+
+    @Override
+    @Transactional
+    public CartResponseDto removeItemFromCart(RemoveItemCartRequest removeItemCartRequest) {
+        Cart cartDb = cartRepository.findById(removeItemCartRequest.getCartId()).orElseThrow(() ->
+                new EntityNotFoundException("Carrito no encontrado"));
+
+        CartItem cartItem = cartDb.getCartItems().stream().filter(item ->
+                        item.getVariantId().equals(removeItemCartRequest.getVariantId())).findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("El producto no fue encontrado en el carrito"));
+
+        cartDb.removeItem(cartItem);
+        Cart updatedCart = cartRepository.save(cartDb);
+        return getCartResponseDto(updatedCart);
 
     }
 
@@ -144,7 +161,7 @@ public class CartServiceImpl implements CartService {
             items.add(dto);
 
             // Recalcular el subtotal
-            subtotal += variant.getPrice();
+            subtotal += cartItem.getQuantity() * variant.getPrice();
         }
 
         CartResponseDto response = new CartResponseDto();

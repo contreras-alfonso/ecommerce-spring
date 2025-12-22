@@ -24,7 +24,7 @@ public class Cart extends Auditable {
 
     @OneToMany(mappedBy = "cart",
             fetch = FetchType.LAZY,
-            cascade = CascadeType.PERSIST,
+            cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     private List<CartItem> cartItems = new ArrayList<>();
