@@ -19,6 +19,9 @@ public class Cart extends Auditable {
     @Column(length = 36)
     private String id;
 
+    @Column(name = "user_id")
+    private String userId;
+
     @Enumerated(EnumType.STRING)
     private CartStatus status = CartStatus.ACTIVE;
 

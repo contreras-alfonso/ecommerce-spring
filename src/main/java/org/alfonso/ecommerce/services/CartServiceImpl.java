@@ -7,10 +7,14 @@ import org.alfonso.ecommerce.dto.RemoveItemCartRequest;
 import org.alfonso.ecommerce.dto.VerifyStockRequest;
 import org.alfonso.ecommerce.entities.*;
 import org.alfonso.ecommerce.exceptions.EntityNotFoundException;
+import org.alfonso.ecommerce.exceptions.InvalidJwtTokenException;
 import org.alfonso.ecommerce.exceptions.NoStockAvailableException;
 import org.alfonso.ecommerce.repositories.CartRepository;
 import org.alfonso.ecommerce.repositories.ProductColorImageRepository;
 import org.alfonso.ecommerce.repositories.ProductVariantRepository;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +30,7 @@ public class CartServiceImpl implements CartService {
     private final ProductVariantRepository productVariantRepository;
     private final ProductColorImageRepository productColorImageRepository;
     private final CartRepository cartRepository;
+    private final JwtService jwtService;
 
     @Override
     @Transactional
@@ -35,10 +40,26 @@ public class CartServiceImpl implements CartService {
             throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
         }
 
+        boolean isAuthenticated = jwtService.isAuthenticated();
+
+
         // Si el ID del carrito no es null, buscarlo en la DB
         if (stockRequest.getCartId() != null) {
             Cart cartDb = cartRepository.findById(stockRequest.getCartId()).orElseThrow(() ->
                     new EntityNotFoundException("Carrito no encontrado"));
+
+
+           /*if (!isAuthenticated && cartDb.getUserId() != null) {
+                throw new InvalidJwtTokenException("No puedes realizar la acción correspondiente");
+            }*/
+
+            System.out.println("isAuthenticated = " + isAuthenticated);
+            System.out.println("cartDb.getUserId() = " + cartDb.getUserId());
+            System.out.println("jwtService.extractId() = " + jwtService.extractId());
+
+            if (isAuthenticated && !cartDb.getUserId().equals(jwtService.extractId())) {
+                throw new InvalidJwtTokenException("El token proporcionado es inválido o ha expirado qweq");
+            }
 
             Optional<CartItem> findCartItem = cartDb.getCartItems().stream().filter(cartItem ->
                     cartItem.getVariantId().equals(stockRequest.getVariantId())).findFirst();
@@ -46,7 +67,13 @@ public class CartServiceImpl implements CartService {
             // Si el item del carrito ya existía, validar por su el stock de la db + stock request
             if (findCartItem.isPresent()) {
                 CartItem cartItemDb = findCartItem.get();
-                Integer totalQuantity = stockRequest.getQuantity();
+                Integer totalQuantity = 0;
+                if (stockRequest.getMode() == StockUpdateMode.ADD) {
+                    totalQuantity = stockRequest.getQuantity() + cartItemDb.getQuantity();
+                } else {
+                    totalQuantity = stockRequest.getQuantity();
+                }
+
                 verifyStock(stockRequest.getVariantId(), totalQuantity);
                 cartItemDb.setQuantity(totalQuantity);
             } else {
@@ -55,6 +82,9 @@ public class CartServiceImpl implements CartService {
                 cartItem.setQuantity(stockRequest.getQuantity());
                 cartItem.setVariantId(stockRequest.getVariantId());
                 cartDb.addItem(cartItem);
+            }
+            if (isAuthenticated) {
+                cartDb.setUserId(jwtService.extractId());
             }
             Cart savedCart = cartRepository.save(cartDb);
             return getCartResponseDto(savedCart);
@@ -70,6 +100,9 @@ public class CartServiceImpl implements CartService {
             item.setQuantity(stockRequest.getQuantity());
 
             Cart cart = new Cart();
+            if (isAuthenticated) {
+                cart.setUserId(jwtService.extractId());
+            }
             cart.addItem(item);
             Cart savedCart = cartRepository.save(cart);
             return getCartResponseDto(savedCart);

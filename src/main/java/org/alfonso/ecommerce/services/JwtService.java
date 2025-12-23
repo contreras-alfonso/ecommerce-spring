@@ -11,8 +11,10 @@ import org.alfonso.ecommerce.dto.TokenPair;
 import org.alfonso.ecommerce.entities.DocumentType;
 import org.alfonso.ecommerce.exceptions.InvalidJwtTokenException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -154,8 +156,30 @@ public class JwtService {
         return userDetails != null ? userDetails.getDocumentType() : DocumentType.DNI;
     }
 
+    public String extractId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("authentication = " + authentication);
+        if (isAuthenticated()) {
+            CustomUserDetails userDetails = this.getUserDetails(authentication);
+            System.out.println("userDetails = " + userDetails);
+            return userDetails != null ? userDetails.getId() : null;
+        } else {
+            return null;
+        }
+
+    }
+
     public CustomUserDetails getUserDetails(Authentication authentication) {
         return (CustomUserDetails) authentication.getPrincipal();
+    }
+
+
+    public boolean isAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return authentication != null &&
+                authentication.isAuthenticated() &&
+                !(authentication instanceof AnonymousAuthenticationToken);
     }
 
 

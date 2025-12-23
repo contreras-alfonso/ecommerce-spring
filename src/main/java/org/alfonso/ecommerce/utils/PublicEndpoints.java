@@ -15,10 +15,17 @@ public class PublicEndpoints {
     private static final List<Pattern> PUBLIC_GET_PATTERNS = List.of(
             Pattern.compile("^/api/categories(/[^/]+)?$"),
             Pattern.compile("^/api/brands(/[^/]+)?$"),
-            Pattern.compile("^/api/colors(/[^/]+)?$")
+            Pattern.compile("^/api/colors(/[^/]+)?$"),
+            Pattern.compile("^/api/products(/[^/]+)?$"),
+            Pattern.compile("^/api/products/by/[^/]+$")
     );
 
-    private PublicEndpoints() {}
+    private static final List<Pattern> PUBLIC_POST_PATTERNS = List.of(
+            Pattern.compile("^/api/cart(/.*)?$")
+    );
+
+    private PublicEndpoints() {
+    }
 
     public static boolean isPublic(HttpServletRequest request) {
         String path = request.getServletPath();
@@ -31,6 +38,11 @@ public class PublicEndpoints {
         }
         if (HttpMethod.GET.matches(method)) {
             return PUBLIC_GET_PATTERNS.stream()
+                    .anyMatch(pattern -> pattern.matcher(path).matches());
+        }
+
+        if (HttpMethod.POST.matches(method)) {
+            return PUBLIC_POST_PATTERNS.stream()
                     .anyMatch(pattern -> pattern.matcher(path).matches());
         }
 
