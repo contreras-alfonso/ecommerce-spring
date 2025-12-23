@@ -51,13 +51,9 @@ public class CartServiceImpl implements CartService {
 
 
             // Si el carrito existe y el usuario no está autenticado
-           if (!isAuthenticated && cartDb.getUserId() != null) {
+            if (!isAuthenticated && cartDb.getUserId() != null) {
                 throw new InvalidJwtTokenException("No puedes realizar la acción correspondiente");
             }
-
-            System.out.println("isAuthenticated = " + isAuthenticated);
-            System.out.println("cartDb.getUserId() = " + cartDb.getUserId());
-            System.out.println("jwtService.extractId() = " + jwtService.extractId());
 
             if (isAuthenticated && !cartDb.getUserId().equals(jwtService.extractId())) {
                 throw new CartUserMismatchException("No tienes permiso para acceder a este carrito");
@@ -123,8 +119,21 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new EntityNotFoundException("El producto no fue encontrado en el carrito"));
 
         cartDb.removeItem(cartItem);
+        if (cartDb.getCartItems().isEmpty()) {
+            cartDb.setStatus(CartStatus.ABANDONED);
+        }
         Cart updatedCart = cartRepository.save(cartDb);
         return getCartResponseDto(updatedCart);
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CartResponseDto findActiveCart() {
+        System.out.println("jwtService.extractId() = " + jwtService.extractId());
+        Cart cartDb = cartRepository.findByStatusAndUserId(CartStatus.ACTIVE, jwtService.extractId()).orElseThrow(() ->
+                new EntityNotFoundException("No cuentas con un carrito activo"));
+        return getCartResponseDto(cartDb);
 
     }
 
@@ -169,6 +178,7 @@ public class CartServiceImpl implements CartService {
                 ));
 
         Double subtotal = 0.0;
+        int itemsQuantity = 0;
 
         for (Object[] row : variants) {
 
@@ -197,12 +207,14 @@ public class CartServiceImpl implements CartService {
 
             // Recalcular el subtotal
             subtotal += cartItem.getQuantity() * variant.getPrice();
+            itemsQuantity += cartItem.getQuantity();
         }
 
         CartResponseDto response = new CartResponseDto();
         response.setCartId(cart.getId());
         response.setItems(items);
         response.setSubtotal(subtotal);
+        response.setItemsCount(itemsQuantity);
 
         return response;
 

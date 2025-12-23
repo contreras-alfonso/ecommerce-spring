@@ -6,10 +6,7 @@ import org.alfonso.ecommerce.dto.RemoveItemCartRequest;
 import org.alfonso.ecommerce.dto.VerifyStockRequest;
 import org.alfonso.ecommerce.services.CartService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -35,6 +32,12 @@ public class CartController {
         CartResponseDto response = productVariantService.removeItemFromCart(removeItemCartRequest);
         return ResponseEntity.ok(response);
 
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<?> findActiveCart() {
+        CartResponseDto response = productVariantService.findActiveCart();
+        return ResponseEntity.ok(response);
     }
 
 }
