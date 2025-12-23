@@ -13,9 +13,6 @@ import org.alfonso.ecommerce.exceptions.NoStockAvailableException;
 import org.alfonso.ecommerce.repositories.CartRepository;
 import org.alfonso.ecommerce.repositories.ProductColorImageRepository;
 import org.alfonso.ecommerce.repositories.ProductVariantRepository;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +42,7 @@ public class CartServiceImpl implements CartService {
 
 
         // Si el ID del carrito no es null, buscarlo en la DB
-        if (stockRequest.getCartId() != null) {
+        if (stockRequest.getCartId() != null && !stockRequest.getCartId().isBlank()) {
             Cart cartDb = cartRepository.findById(stockRequest.getCartId()).orElseThrow(() ->
                     new EntityNotFoundException("Carrito no encontrado"));
 
@@ -65,7 +62,7 @@ public class CartServiceImpl implements CartService {
             // Si el item del carrito ya existía, validar por su el stock de la db + stock request
             if (findCartItem.isPresent()) {
                 CartItem cartItemDb = findCartItem.get();
-                Integer totalQuantity = 0;
+                int totalQuantity = 0;
                 if (stockRequest.getMode() == StockUpdateMode.ADD) {
                     totalQuantity = stockRequest.getQuantity() + cartItemDb.getQuantity();
                 } else {
@@ -75,6 +72,8 @@ public class CartServiceImpl implements CartService {
                 verifyStock(stockRequest.getVariantId(), totalQuantity);
                 cartItemDb.setQuantity(totalQuantity);
             } else {
+                // Validar stock
+                verifyStock(stockRequest.getVariantId(), stockRequest.getQuantity());
                 // Si el item no existía crearlo
                 CartItem cartItem = new CartItem();
                 cartItem.setQuantity(stockRequest.getQuantity());
@@ -124,13 +123,11 @@ public class CartServiceImpl implements CartService {
         }
         Cart updatedCart = cartRepository.save(cartDb);
         return getCartResponseDto(updatedCart);
-
     }
 
     @Override
     @Transactional(readOnly = true)
     public CartResponseDto findActiveCart() {
-        System.out.println("jwtService.extractId() = " + jwtService.extractId());
         Cart cartDb = cartRepository.findByStatusAndUserId(CartStatus.ACTIVE, jwtService.extractId()).orElseThrow(() ->
                 new EntityNotFoundException("No cuentas con un carrito activo"));
         return getCartResponseDto(cartDb);
@@ -140,6 +137,9 @@ public class CartServiceImpl implements CartService {
     private void verifyStock(String variantId, Integer requestedQuantity) {
         Integer currentStock = productVariantRepository.findStockById(variantId);
 
+        System.out.println("currentStock = " + currentStock);
+        System.out.println("variantId = " + variantId);
+        System.out.println("requestedQuantity = " + requestedQuantity);
         if (currentStock == null) {
             throw new EntityNotFoundException("No se pudo encontrar la variante");
         }
@@ -215,6 +215,7 @@ public class CartServiceImpl implements CartService {
         response.setItems(items);
         response.setSubtotal(subtotal);
         response.setItemsCount(itemsQuantity);
+        response.setStatus(cart.getStatus());
 
         return response;
 

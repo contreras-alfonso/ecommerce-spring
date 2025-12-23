@@ -58,7 +58,6 @@ public class CategoryServiceImpl implements CategoryService {
                 });
 
                 String slug = GeneralUtil.createUniqueSlug(category.getName(), categoryRepository);
-                System.out.println("slug = " + slug);
                 categoryDb.setSlug(slug);
             }
             categoryDb.setName(category.getName());

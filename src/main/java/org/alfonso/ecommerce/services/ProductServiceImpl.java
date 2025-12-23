@@ -180,7 +180,6 @@ public class ProductServiceImpl implements ProductService {
         // Guardar el producto
         Product savedProduct = productRepository.save(productToSave);
 
-        System.out.println("savedProduct.getId() = " + savedProduct.getId());
 
         //Ordenar imágenes por colorId
         Map<String, List<MultipartFile>> groupFilesByKey = productServiceUtil.groupFilesByKey(files);

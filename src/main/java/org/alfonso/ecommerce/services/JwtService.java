@@ -158,10 +158,8 @@ public class JwtService {
 
     public String extractId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("authentication = " + authentication);
         if (isAuthenticated()) {
             CustomUserDetails userDetails = this.getUserDetails(authentication);
-            System.out.println("userDetails = " + userDetails);
             return userDetails != null ? userDetails.getId() : null;
         } else {
             return null;
