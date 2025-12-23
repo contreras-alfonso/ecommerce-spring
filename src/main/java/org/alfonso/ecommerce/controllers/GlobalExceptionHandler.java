@@ -138,10 +138,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({InvalidJwtTokenException.class})
     public ResponseEntity<Error> handleInvalidJwtToken(InvalidJwtTokenException ex) {
         Error error = new Error();
-        error.setError(ex.getMessage());
-        error.setMsg("El token proporcionado es inválido o ha expirado");
+        error.setError("TOKEN_INVALID_OR_EXPIRED");
+        error.setMsg(ex.getMessage());
         error.setStatus(HttpStatus.UNAUTHORIZED.value());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(error);
+    }
+
+    @ExceptionHandler({CartUserMismatchException.class})
+    public ResponseEntity<Error> handleCartUserMismatchException(CartUserMismatchException ex) {
+        Error error = new Error();
+        error.setError("CART_USER_MISMATCH");
+        error.setMsg(ex.getMessage());
+        error.setStatus(HttpStatus.FORBIDDEN.value());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).body(error);
     }
 
     @ExceptionHandler({MissingAuthorizationHeaderException.class})

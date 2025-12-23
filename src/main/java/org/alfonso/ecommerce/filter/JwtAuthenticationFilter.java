@@ -10,7 +10,6 @@ import org.alfonso.ecommerce.exceptions.InvalidJwtTokenException;
 import org.alfonso.ecommerce.exceptions.MissingAuthorizationHeaderException;
 import org.alfonso.ecommerce.services.JwtService;
 import org.alfonso.ecommerce.utils.JwtErrorResponseWriter;
-import org.alfonso.ecommerce.utils.PublicEndpoints;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,17 +32,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        final String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
-
-            if (PublicEndpoints.isPublic(request)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            final String authHeader = request.getHeader("Authorization");
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                throw new MissingAuthorizationHeaderException("Authorization header missing or malformed");
-            }
 
             String jwt = getJwtFormRequest(request);
 

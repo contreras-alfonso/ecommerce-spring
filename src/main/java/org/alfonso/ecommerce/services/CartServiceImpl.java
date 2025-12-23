@@ -6,6 +6,7 @@ import org.alfonso.ecommerce.dto.CartResponseDto;
 import org.alfonso.ecommerce.dto.RemoveItemCartRequest;
 import org.alfonso.ecommerce.dto.VerifyStockRequest;
 import org.alfonso.ecommerce.entities.*;
+import org.alfonso.ecommerce.exceptions.CartUserMismatchException;
 import org.alfonso.ecommerce.exceptions.EntityNotFoundException;
 import org.alfonso.ecommerce.exceptions.InvalidJwtTokenException;
 import org.alfonso.ecommerce.exceptions.NoStockAvailableException;
@@ -49,16 +50,17 @@ public class CartServiceImpl implements CartService {
                     new EntityNotFoundException("Carrito no encontrado"));
 
 
-           /*if (!isAuthenticated && cartDb.getUserId() != null) {
+            // Si el carrito existe y el usuario no está autenticado
+           if (!isAuthenticated && cartDb.getUserId() != null) {
                 throw new InvalidJwtTokenException("No puedes realizar la acción correspondiente");
-            }*/
+            }
 
             System.out.println("isAuthenticated = " + isAuthenticated);
             System.out.println("cartDb.getUserId() = " + cartDb.getUserId());
             System.out.println("jwtService.extractId() = " + jwtService.extractId());
 
             if (isAuthenticated && !cartDb.getUserId().equals(jwtService.extractId())) {
-                throw new InvalidJwtTokenException("El token proporcionado es inválido o ha expirado qweq");
+                throw new CartUserMismatchException("No tienes permiso para acceder a este carrito");
             }
 
             Optional<CartItem> findCartItem = cartDb.getCartItems().stream().filter(cartItem ->

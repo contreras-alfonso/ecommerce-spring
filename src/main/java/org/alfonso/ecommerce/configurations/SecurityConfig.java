@@ -2,6 +2,7 @@ package org.alfonso.ecommerce.configurations;
 
 import lombok.RequiredArgsConstructor;
 import org.alfonso.ecommerce.exceptions.CustomAccessDeniedHandler;
+import org.alfonso.ecommerce.exceptions.CustomAuthenticationEntryPoint;
 import org.alfonso.ecommerce.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +34,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -67,6 +69,7 @@ public class SecurityConfig {
 
                 )
                 .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
