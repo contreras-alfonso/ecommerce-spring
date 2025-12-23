@@ -1,7 +1,9 @@
 package org.alfonso.ecommerce.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.alfonso.ecommerce.dto.CartResponseDto;
+import org.alfonso.ecommerce.dto.FindActiveCartRequest;
 import org.alfonso.ecommerce.dto.RemoveItemCartRequest;
 import org.alfonso.ecommerce.dto.VerifyStockRequest;
 import org.alfonso.ecommerce.services.CartService;
@@ -18,7 +20,7 @@ public class CartController {
 
     @PostMapping("/verify")
     public ResponseEntity<?> verifyStock(
-            @RequestBody VerifyStockRequest verifyStockRequest
+            @Valid @RequestBody VerifyStockRequest verifyStockRequest
     ) {
         CartResponseDto response = productVariantService.checkStockAndUpdateCart(verifyStockRequest);
         return ResponseEntity.ok(response);
@@ -27,7 +29,7 @@ public class CartController {
 
     @PostMapping("/remove")
     public ResponseEntity<?> removeItem(
-            @RequestBody RemoveItemCartRequest removeItemCartRequest
+            @Valid @RequestBody RemoveItemCartRequest removeItemCartRequest
     ) {
         CartResponseDto response = productVariantService.removeItemFromCart(removeItemCartRequest);
         return ResponseEntity.ok(response);
@@ -35,8 +37,16 @@ public class CartController {
     }
 
     @GetMapping("/active")
-    public ResponseEntity<?> findActiveCart() {
-        CartResponseDto response = productVariantService.findActiveCart();
+    public ResponseEntity<?> findActiveCartFromUser() {
+        CartResponseDto response = productVariantService.findActiveCartFromUser();
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/active-guest")
+    public ResponseEntity<?> findActiveCart(
+            @Valid @RequestBody FindActiveCartRequest request
+    ) {
+        CartResponseDto response = productVariantService.findActiveCart(request);
         return ResponseEntity.ok(response);
     }
 

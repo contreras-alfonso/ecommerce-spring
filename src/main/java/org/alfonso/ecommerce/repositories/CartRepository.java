@@ -10,4 +10,7 @@ import java.util.Optional;
 public interface CartRepository extends JpaRepository<Cart, String> {
     @Query("SELECT c FROM Cart c WHERE c.status = :status AND c.userId = :userId")
     Optional<Cart> findByStatusAndUserId(CartStatus status, String userId);
+
+    @Query("SELECT c FROM Cart c WHERE c.status = :status AND c.userId IS NULL AND c.id = :cartId")
+    Optional<Cart> findByStatusAndCartId(CartStatus status, String cartId);
 }

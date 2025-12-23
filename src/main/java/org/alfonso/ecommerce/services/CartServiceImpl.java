@@ -1,10 +1,7 @@
 package org.alfonso.ecommerce.services;
 
 import lombok.RequiredArgsConstructor;
-import org.alfonso.ecommerce.dto.CartItemDto;
-import org.alfonso.ecommerce.dto.CartResponseDto;
-import org.alfonso.ecommerce.dto.RemoveItemCartRequest;
-import org.alfonso.ecommerce.dto.VerifyStockRequest;
+import org.alfonso.ecommerce.dto.*;
 import org.alfonso.ecommerce.entities.*;
 import org.alfonso.ecommerce.exceptions.CartUserMismatchException;
 import org.alfonso.ecommerce.exceptions.EntityNotFoundException;
@@ -127,11 +124,20 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional(readOnly = true)
-    public CartResponseDto findActiveCart() {
+    public CartResponseDto findActiveCartFromUser() {
         Cart cartDb = cartRepository.findByStatusAndUserId(CartStatus.ACTIVE, jwtService.extractId()).orElseThrow(() ->
                 new EntityNotFoundException("No cuentas con un carrito activo"));
         return getCartResponseDto(cartDb);
 
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CartResponseDto findActiveCart(FindActiveCartRequest request) {
+        System.out.println("request.getCartId() = " + request.getCartId());
+        Cart cartDb = cartRepository.findByStatusAndCartId(CartStatus.ACTIVE, request.getCartId()).orElseThrow(() ->
+                new EntityNotFoundException("No cuentas con un carrito activo"));
+        return getCartResponseDto(cartDb);
     }
 
     private void verifyStock(String variantId, Integer requestedQuantity) {

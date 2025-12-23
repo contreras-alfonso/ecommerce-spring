@@ -57,14 +57,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors-> cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/api/auth/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories", "/api/categories/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/brands", "/api/brands/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/colors", "/api/colors/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/*", "/api/products/by/*").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/cart/*").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/cart/verify", "/api/cart/active-guest", "/api/cart/remove").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/cart/active").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/cart/*").permitAll()
                         .anyRequest().authenticated()
 
                 )
