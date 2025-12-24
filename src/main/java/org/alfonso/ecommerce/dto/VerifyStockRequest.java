@@ -11,7 +11,6 @@ import org.alfonso.ecommerce.entities.StockUpdateMode;
 @AllArgsConstructor
 public class VerifyStockRequest {
     private StockUpdateMode mode;
-    @NotBlank(message = "El Id del carrito es obligatorio")
     private String cartId;
     @NotBlank(message = "El Id de la variante es obligatoria")
     private String variantId;
