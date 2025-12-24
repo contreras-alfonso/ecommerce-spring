@@ -201,6 +201,7 @@ public class CartServiceImpl implements CartService {
             dto.setVariantId(variant.getId());
 
             dto.setPrice(variant.getPrice());
+            dto.setSubtotal(cartItem.getQuantity() * variant.getPrice());
             dto.setImageUrl(imageUrl);
             dto.setQuantity(cartItem.getQuantity());
 

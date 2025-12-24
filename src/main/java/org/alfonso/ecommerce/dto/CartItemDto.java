@@ -11,6 +11,7 @@ public class CartItemDto {
     private String variantId;
 
     private Double price;
+    private Double subtotal;
     private String imageUrl;
     private Integer quantity;
 
