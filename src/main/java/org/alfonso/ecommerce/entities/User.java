@@ -6,13 +6,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "users")
-public class User extends Auditable{
+public class User extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "VARCHAR(36)")
@@ -42,5 +45,24 @@ public class User extends Auditable{
 
     private String phone;
 
+    @OneToMany(mappedBy = "user",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<ShippingAddress> addresses;
 
+    public User() {
+        this.addresses = new ArrayList<>();
+    }
+
+    public void addShippingAddress(ShippingAddress address) {
+        this.addresses.add(address);
+        address.setUser(this);
+    }
+
+    public void removeShippingAddress(ShippingAddress address) {
+        this.addresses.remove(address);
+        address.setUser(null);
+    }
 }
