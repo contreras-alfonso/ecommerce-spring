@@ -31,7 +31,7 @@ public class ShippingAddressController {
     @PutMapping("/{id}")
     public ResponseEntity<ShippingAddress> update(
             @PathVariable String id,
-            @Valid ShippingAddress address
+            @Valid @RequestBody ShippingAddress address
     ) {
         return ResponseEntity.ok(shippingAddressService.update(id, address));
     }
