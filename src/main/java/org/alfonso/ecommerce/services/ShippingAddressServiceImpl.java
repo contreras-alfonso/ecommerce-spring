@@ -20,6 +20,13 @@ public class ShippingAddressServiceImpl implements ShippingAddressService {
     private final ShippingAddressRepository shippingAddressRepository;
     private final JwtService jwtService;
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countAll() {
+        return shippingAddressRepository.countByUserIdAndIsDeletedFalse(jwtService.extractId());
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<ShippingAddress> findAll() {
@@ -32,7 +39,7 @@ public class ShippingAddressServiceImpl implements ShippingAddressService {
         User user = userRepository.findById(jwtService.extractId()).orElseThrow(
                 () -> new UserNotFoundException("El usuario no pudo ser encontrado"));
 
-        ensureSingleDefaultShippingAddress(shippingAddress);
+        ensureSingleDefaultShippingAddress(shippingAddress, "");
 
         user.addShippingAddress(shippingAddress);
         userRepository.save(user);
@@ -46,7 +53,7 @@ public class ShippingAddressServiceImpl implements ShippingAddressService {
                 findByIdAndUserIdAndIsDeletedFalse(addressId, jwtService.extractId()).orElseThrow(
                         () -> new EntityNotFoundException("La dirección no pudo ser encontrada"));
 
-        ensureSingleDefaultShippingAddress(shippingAddress);
+        ensureSingleDefaultShippingAddress(shippingAddress, "UPDATE");
 
         shippingAddressDb.setAddress(shippingAddress.getAddress());
         shippingAddressDb.setReference(shippingAddress.getReference());
@@ -63,7 +70,7 @@ public class ShippingAddressServiceImpl implements ShippingAddressService {
 
     @Override
     @Transactional
-    public void delete(String addressId) {
+    public List<ShippingAddress> delete(String addressId) {
         ShippingAddress shippingAddressDb = shippingAddressRepository.
                 findByIdAndUserIdAndIsDeletedFalse(addressId, jwtService.extractId()).orElseThrow(
                         () -> new EntityNotFoundException("La dirección no pudo ser encontrada"));
@@ -79,12 +86,18 @@ public class ShippingAddressServiceImpl implements ShippingAddressService {
             firstAddress.setDefault(true);
             shippingAddressRepository.save(firstAddress);
         }
+
+        return addresses;
     }
 
-    private void ensureSingleDefaultShippingAddress(ShippingAddress shippingAddress) {
+    private void ensureSingleDefaultShippingAddress(ShippingAddress shippingAddress, String mode) {
         long countAddresses = shippingAddressRepository.countByUserIdAndIsDeletedFalse(jwtService.extractId());
         // Si no tiene direcciones por defecto, hacer la actual por defecto
-        if (countAddresses == 0 && !shippingAddress.isDefault()) {
+        if (mode.equals("UPDATE")) {
+            if (countAddresses == 1 && !shippingAddress.isDefault()) {
+                shippingAddress.setDefault(true);
+            }
+        } else if (countAddresses == 0 && !shippingAddress.isDefault()) {
             shippingAddress.setDefault(true);
         }
         // Si es dirección por defecto

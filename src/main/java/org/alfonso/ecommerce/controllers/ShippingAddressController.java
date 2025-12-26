@@ -21,6 +21,11 @@ public class ShippingAddressController {
         return ResponseEntity.ok(shippingAddressService.findAll());
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Long> countAll() {
+        return ResponseEntity.ok(shippingAddressService.countAll());
+    }
+
     @PostMapping
     public ResponseEntity<ShippingAddress> save(
             @Valid @RequestBody ShippingAddress address
@@ -37,10 +42,9 @@ public class ShippingAddressController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<List<ShippingAddress>> delete(
             @PathVariable String id
     ) {
-        shippingAddressService.delete(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(shippingAddressService.delete(id));
     }
 }
