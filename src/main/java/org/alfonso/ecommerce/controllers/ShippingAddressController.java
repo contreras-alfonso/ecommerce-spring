@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/api/addresses")
 @RequiredArgsConstructor
 public class ShippingAddressController {
-    private ShippingAddressService shippingAddressService;
+    private final ShippingAddressService shippingAddressService;
 
     @GetMapping
     public ResponseEntity<List<ShippingAddress>> findAll() {
@@ -23,7 +23,7 @@ public class ShippingAddressController {
 
     @PostMapping
     public ResponseEntity<ShippingAddress> save(
-            @Valid ShippingAddress address
+            @Valid @RequestBody ShippingAddress address
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(shippingAddressService.save(address));
     }
